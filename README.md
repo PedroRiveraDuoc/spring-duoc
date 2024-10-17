@@ -24,7 +24,7 @@ Este proyecto sirve como una demostración del uso efectivo de tecnologías Java
 ## Cómo Empezar
 ### Clonar el Repositorio
 ```bash
-[https://github.com/yourusername/SecureRecipeApp](https://github.com/PedroRiveraDuoc/spring-duoc).git
+git clone https://github.com/PedroRiveraDuoc/spring-duoc.git
 cd spring-duoc
 ```
 
