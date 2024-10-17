@@ -1,7 +1,7 @@
 #  Duoc App-Web | Spring
 
 ## Descripción
-SecureRecipeApp es una aplicación web diseñada para gestionar y compartir recetas de cocina de manera segura. Construida con Spring Boot, incorpora Spring Security para la autenticación y autorización de usuarios, garantizando que solo los usuarios registrados puedan acceder y gestionar las recetas. El frontend está desarrollado con Thymeleaf, HTML y CSS, proporcionando una interfaz de usuario moderna y receptiva.
+Aplicación web diseñada para gestionar y compartir recetas de cocina de manera segura. Construida con Spring Boot, incorpora Spring Security para la autenticación y autorización de usuarios, garantizando que solo los usuarios registrados puedan acceder y gestionar las recetas. El frontend está desarrollado con Thymeleaf, HTML y CSS, proporcionando una interfaz de usuario moderna y receptiva.
 
 Este proyecto sirve como una demostración del uso efectivo de tecnologías Java y un diseño de interfaz simple para crear una experiencia web segura y atractiva.
 
