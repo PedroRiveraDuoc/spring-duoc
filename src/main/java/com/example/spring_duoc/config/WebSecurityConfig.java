@@ -19,49 +19,53 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
+  private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        logger.info("Configuring security filter chain...");
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    logger.info("Configuring security filter chain...");
 
-        http
-                .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/", "/home", "/login", "/css/**", "/js/**", "/images/**").permitAll()
-                        .anyRequest().authenticated())
-                .formLogin((form) -> form
-                        .loginPage("/login")
-                        .defaultSuccessUrl("/home", true)
-                        .permitAll())
-                .logout((logout) -> logout.permitAll());
+    http
+        .authorizeHttpRequests((requests) -> requests
+            .requestMatchers("/", "/home", "/login", "/css/**", "/js/**",
+                "/images/**")
+            .permitAll()
+            .requestMatchers("/api/recipes", "/api/recipes/{id}")
+            .hasAnyRole("ADMIN", "USER")
+            .anyRequest().authenticated())
+        .formLogin((form) -> form
+            .loginPage("/login")
+            .defaultSuccessUrl("/home", true)
+            .permitAll())
+        .logout((logout) -> logout.permitAll());
 
-        logger.info("Security filter chain configured successfully.");
-        return http.build();
-    }
+    logger.info("Security filter chain configured successfully.");
+    return http.build();
+  }
 
-    @Bean
-    @Description("In memory UserDetails service registered since DB doesn't have user table")
-    public UserDetailsService users() {
-        logger.info("Creating in-memory user details...");
+  @Bean
+  @Description("In memory UserDetails service registered since DB doesn't have user table")
+  public UserDetailsService users() {
+    logger.info("Creating in-memory user details...");
 
-        UserDetails user = User.builder()
-                .username("user")
-                .password(passwordEncoder().encode("password"))
-                .roles("USER")
-                .build();
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("password"))
-                .roles("USER", "ADMIN")
-                .build();
+    UserDetails user = User.builder()
+        .username("user")
+        .password(passwordEncoder().encode("password"))
+        .roles("USER")
+        .build();
+    UserDetails admin = User.builder()
+        .username("admin")
+        .password(passwordEncoder().encode("password"))
+        .roles("USER", "ADMIN")
+        .build();
 
-        logger.info("User 'user' and 'admin' created successfully.");
-        return new InMemoryUserDetailsManager(user, admin);
-    }
+    logger.info("User 'user' and 'admin' created successfully.");
+    return new InMemoryUserDetailsManager(user, admin);
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        logger.info("Configuring password encoder (BCryptPasswordEncoder)...");
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    logger.info("Configuring password encoder (BCryptPasswordEncoder)...");
+    return new BCryptPasswordEncoder();
+  }
 }
