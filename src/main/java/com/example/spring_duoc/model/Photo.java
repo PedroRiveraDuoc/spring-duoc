@@ -12,7 +12,7 @@ public class Photo {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id; // Identificador único para cada foto
+  private Long id;
 
   private String url;
   private String description;
