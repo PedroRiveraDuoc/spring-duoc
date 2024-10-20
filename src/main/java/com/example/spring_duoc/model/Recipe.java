@@ -9,6 +9,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 import java.util.List;
+import jakarta.persistence.CascadeType;
 
 @Entity
 @Table(name = "recipe")
@@ -29,7 +30,7 @@ public class Recipe {
 
   private Difficulty difficulty;
 
-  @OneToMany
+  @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Photo> photos;
 
   // Constructor vacío

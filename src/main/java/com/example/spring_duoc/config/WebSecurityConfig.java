@@ -30,7 +30,7 @@ public class WebSecurityConfig {
             .requestMatchers("/", "/home", "/login", "/css/**", "/js/**",
                 "/images/**")
             .permitAll()
-            .requestMatchers("/api/recipes", "/api/recipes/{id}")
+            .requestMatchers("/recipes", "/recipes/{id}")
             .hasAnyRole("ADMIN", "USER")
             .anyRequest().authenticated())
         .formLogin((form) -> form

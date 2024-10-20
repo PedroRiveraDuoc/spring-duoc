@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Detalle de la receta</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-gray-100 text-gray-800">
+    <div class="max-w-4xl mx-auto p-6">
+      <h1 class="text-3xl font-bold text-center mb-6" th:text="${recipe.title}">
+        Titulo
+      </h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <p class="text-lg" th:text="${recipe.description}">Descripción</p>
+
+          <p class="font-bold mt-4">Ingredientes:</p>
+          <ul class="list-disc pl-5">
+            <li
+              th:each="ingredient : ${recipe.ingredients}"
+              th:text="${ingredient}"
+            ></li>
+          </ul>
+
+          <p class="mt-4">
+            <strong>Instrucciones:</strong>
+            <span th:text="${recipe.instructions}"></span>
+          </p>
+          <p class="mt-2">
+            <strong>Tiempo de preparación:</strong>
+            <span th:text="${recipe.cookTime}"></span> minutos
+          </p>
+          <p class="mt-2">
+            <strong>Dificultad:</strong>
+            <span th:text="${recipe.difficulty}"></span>
+          </p>
+        </div>
+
+        <div>
+          <!-- Verificar si hay fotos -->
+          <div
+            th:if="${recipe.photos != null and #lists.size(recipe.photos) > 0}"
+          >
+            <img
+              th:src="${recipe.photos[0].url}"
+              alt="Recipe Image"
+              class="rounded shadow-lg"
+            />
+          </div>
+
+          <!-- Caso en que no haya fotos -->
+          <div
+            th:if="${recipe.photos == null or #lists.size(recipe.photos) == 0}"
+          >
+            <p class="text-red-500">No hay imágenes disponibles</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="text-center mt-6">
+        <a
+          href="/recipes"
+          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >Volver a listado de recetas</a
+        >
+      </div>
+    </div>
+  </body>
+</html>
