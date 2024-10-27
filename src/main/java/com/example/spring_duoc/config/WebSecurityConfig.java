@@ -37,7 +37,7 @@ public class WebSecurityConfig {
             .loginPage("/login")
             .defaultSuccessUrl("/home", true)
             .permitAll())
-        .logout((logout) -> logout.permitAll());
+        .logout((logout) -> logout.logoutUrl("/logout").logoutSuccessUrl("/home").permitAll());
 
     logger.info("Security filter chain configured successfully.");
     return http.build();
