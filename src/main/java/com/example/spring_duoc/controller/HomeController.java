@@ -9,12 +9,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.security.core.Authentication;
 
 @Controller
 public class HomeController {
@@ -45,39 +47,34 @@ public class HomeController {
     @GetMapping("/greetings")
     public String greeting(@RequestParam(name = "name", required = false, defaultValue = "Juan González") String name,
             Model model) {
-        logger.info("Accediendo al endpoint /greetings con nombre: {}", name);
-
-        String url = "http://localhost:8080/greetings";
-        String token = tokenStore.getToken();
-
-        if (token == null || token.isEmpty()) {
-            logger.warn("Token JWT no encontrado en TokenStore.");
-            model.addAttribute("name", "Token no disponible. Por favor, inicie sesión.");
-            return "greetings";
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return "redirect:/login";
         }
 
-        // Crear los encabezados de la solicitud y añadir el token
+        System.out.println("Nombre de usuario autenticado: " + auth.getName());
+        String token = tokenStore.getToken();
+        if (token == null) {
+            System.out.println("Token JWT no encontrado en TokenStore");
+            return "redirect:/login";
+        }
+
+        String url = "http://localhost:8080/greetings";
+        final var restTemplate = new RestTemplate();
+
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + token); // Añadir "Bearer " antes del token
+        headers.set("Authorization", token);
         HttpEntity<String> entity = new HttpEntity<>("parameters", headers);
 
-        // Construir la URL con los parámetros
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("name", name);
 
-        // Realizar la petición con el token en el encabezado y los parámetros en la URL
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity,
-                    String.class);
+        ResponseEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity,
+                String.class);
+        System.out.println("Response: " + response);
+        model.addAttribute("name", response.getBody());
 
-            logger.info("Respuesta recibida del backend: {}", response.getBody());
-            model.addAttribute("name", response.getBody());
-        } catch (Exception ex) {
-            logger.error("Error al realizar la solicitud al backend: {}", ex.getMessage());
-            model.addAttribute("name", "Error al obtener saludo. Intente más tarde.");
-        }
-
-        return "greetings";
+        return "Greetings";
     }
+
 }
