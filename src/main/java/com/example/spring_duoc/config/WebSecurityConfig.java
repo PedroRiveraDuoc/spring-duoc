@@ -31,16 +31,21 @@ public class WebSecurityConfig {
 
         http
             .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/", "/home", "/login", "/css/**", "/js/**", "/images/**").permitAll()  // Rutas públicas
-                .requestMatchers("/recipes", "/recipes/{id}").hasAnyRole("ADMIN", "USER")  // Rutas con roles específicos
-                .anyRequest().authenticated()  // Cualquier otra ruta requiere autenticación
+                .requestMatchers("/", "/home", "/login", "/css/**", "/js/**", "/images/**").permitAll()
+                .requestMatchers("/recipes", "/recipes/{id}").hasAnyRole("ADMIN", "USER")
+                .anyRequest().authenticated()
             )
             .formLogin((form) -> form
                 .loginPage("/login")
                 .defaultSuccessUrl("/home", true)
                 .permitAll()
             )
-            .logout((logout) -> logout.permitAll());
+            .logout((logout) -> logout
+                .logoutUrl("/logout") // URL para el logout
+                .logoutSuccessUrl("/login?logout") // Redirigir a login con un parámetro de estado
+                .invalidateHttpSession(true) // Invalida la sesión actual
+                .deleteCookies("JSESSIONID") // Elimina cookies de sesión
+                .permitAll());
 
         return http.build();
     }
@@ -57,3 +62,4 @@ public class WebSecurityConfig {
         return new BCryptPasswordEncoder();
     }
 }
+

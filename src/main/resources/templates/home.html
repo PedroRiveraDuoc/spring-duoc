@@ -22,9 +22,15 @@
             <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
                 <!-- Cuando está autenticado -->
                 <div sec:authorize="isAuthenticated()">
-                    <span class="text-gray-900 dark:text-white">¡Hola, <span sec:authentication="username"></span>!</span>
-                    <a href="/logout" class="text-blue-700 hover:underline ml-4">Cerrar Sesión</a>
+                    <span class="text-gray-900 dark:text-white">¡Hola, <span
+                            sec:authentication="username"></span>!</span>
+
+                    <!-- Botón de Logout usando un formulario POST -->
+                    <form th:action="@{/logout}" method="post" style="display: inline;">
+                        <button type="submit" class="text-blue-700 hover:underline ml-4">Cerrar Sesión</button>
+                    </form>
                 </div>
+
                 <!-- Cuando NO está autenticado -->
                 <div sec:authorize="!isAuthenticated()">
                     <a href="/login"
@@ -66,6 +72,7 @@
             </div>
         </div>
     </nav>
+
 
 
     <!-- Contenido principal -->
