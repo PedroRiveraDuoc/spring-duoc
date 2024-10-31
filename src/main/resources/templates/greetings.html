@@ -1,0 +1,37 @@
+<!-- Ruta: src/main/resources/templates/greetings.html -->
+
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Saludo desde el Backend</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.0/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <!-- Contenedor principal -->
+    <div class="max-w-3xl mx-auto p-8">
+        <h1 class="text-4xl font-bold text-center text-gray-900 mb-6" th:text="|${name}!|">¡Saludo desde el Backend!</h1>
+
+        <!-- Mensaje de bienvenida cuando el usuario está autenticado -->
+        <div sec:authorize="isAuthenticated()" class="text-center">
+            <h2 class="text-2xl font-semibold text-gray-700 mb-4">Hola, <span th:text="${#authentication.name}">Usuario</span>!</h2>
+            <p class="text-gray-600">Esta es una respuesta de una llamada a la API externa con token JWT.</p>
+        </div>
+
+        <!-- Mensaje cuando el usuario no está autenticado -->
+        <div sec:authorize="!isAuthenticated()" class="text-center">
+            <p class="text-lg text-red-500">Debes iniciar sesión para ver este contenido.</p>
+            <a href="/login" class="bg-blue-600 text-white px-6 py-2 rounded-lg mt-4 inline-block">Iniciar sesión</a>
+        </div>
+
+        <!-- Botón para regresar a la página principal -->
+        <div class="text-center mt-10">
+            <a href="/home" class="bg-gray-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-gray-700 transition-colors inline-flex items-center space-x-2">
+                <span>Volver a Inicio</span>
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

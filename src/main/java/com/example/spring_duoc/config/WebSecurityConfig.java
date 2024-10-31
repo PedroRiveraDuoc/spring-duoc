@@ -1,74 +1,59 @@
 package com.example.spring_duoc.config;
 
+import com.example.spring_duoc.service.CustomUserDetailsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Description;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-  private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
+    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
 
-  @Bean
-  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-    logger.info("Configuring security filter chain...");
+    private final CustomUserDetailsService customUserDetailsService;
 
-    http
-        .authorizeHttpRequests((requests) -> requests
-            .requestMatchers("/", "/home", "/login", "/css/**", "/js/**",
-                "/images/**")
-            .permitAll()
-            .requestMatchers("/recipes", "/recipes/{id}")
-            .hasAnyRole("ADMIN", "USER")
-            .anyRequest().authenticated())
-        .formLogin((form) -> form
-            .loginPage("/login")
-            .defaultSuccessUrl("/home", true)
-            .permitAll())
-        .logout(logout -> logout
-            .logoutUrl("/logout") // URL para el logout
-            .logoutSuccessUrl("/home") // Redirige a /home después de logout
-            .permitAll());
+    public WebSecurityConfig(CustomUserDetailsService customUserDetailsService) {
+        this.customUserDetailsService = customUserDetailsService;
+    }
 
-    logger.info("Security filter chain configured successfully.");
-    return http.build();
-  }
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        logger.info("Configuring security filter chain...");
 
-  @Bean
-  @Description("In memory UserDetails service registered since DB doesn't have user table")
-  public UserDetailsService users() {
-    logger.info("Creating in-memory user details...");
+        http
+            .authorizeHttpRequests((requests) -> requests
+                .requestMatchers("/", "/home", "/login", "/css/**", "/js/**", "/images/**").permitAll()  // Rutas públicas
+                .requestMatchers("/recipes", "/recipes/{id}").hasAnyRole("ADMIN", "USER")  // Rutas con roles específicos
+                .anyRequest().authenticated()  // Cualquier otra ruta requiere autenticación
+            )
+            .formLogin((form) -> form
+                .loginPage("/login")
+                .defaultSuccessUrl("/home", true)
+                .permitAll()
+            )
+            .logout((logout) -> logout.permitAll());
 
-    UserDetails user = User.builder()
-        .username("user")
-        .password(passwordEncoder().encode("password"))
-        .roles("USER")
-        .build();
-    UserDetails admin = User.builder()
-        .username("admin")
-        .password(passwordEncoder().encode("password"))
-        .roles("USER", "ADMIN")
-        .build();
+        return http.build();
+    }
 
-    logger.info("User 'user' and 'admin' created successfully.");
-    return new InMemoryUserDetailsManager(user, admin);
-  }
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder auth = http.getSharedObject(AuthenticationManagerBuilder.class);
+        auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
+        return auth.build();
+    }
 
-  @Bean
-  public PasswordEncoder passwordEncoder() {
-    logger.info("Configuring password encoder (BCryptPasswordEncoder)...");
-    return new BCryptPasswordEncoder();
-  }
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 }
